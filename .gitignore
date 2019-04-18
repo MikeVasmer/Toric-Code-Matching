@@ -102,3 +102,14 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# END OF STANDARD .GITIGNORE
+
+# jupyter notebooks used for initial development
+jupyter-dev-notebooks/
+
+# vscode 
+.vscode/
+
+# nose test files
+.noseids
