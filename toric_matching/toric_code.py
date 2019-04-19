@@ -1,6 +1,7 @@
 import networkx as nx
 import itertools
 import random
+import matplotlib.pyplot as plt
 from toric_matching.code import Code
 
 
@@ -12,7 +13,7 @@ def manhattan_distance(x, y, l):
     return dist
 
 
-class Toric_Code(Code):
+class ToricCode(Code):
 
     def __init__(self, dim, l):
         Code.__init__(self, dim, l)
@@ -35,13 +36,21 @@ class Toric_Code(Code):
         elif self.dim > 3:
             self.pos = nx.spring_layout(self.lattice)
 
-    def draw(self):
+    def draw_lattice(self):
         nx.draw(self.lattice, self.pos)
         # node_labels = nx.get_node_attributes(self.lattice, 'stabilizer_value')
         # nx.draw_networkx_labels(self.lattice, self.pos, labels=node_labels)
         # edge_labels = nx.get_edge_attributes(self.lattice, 'qubit_state')
         # nx.draw_networkx_edge_labels(
         #     self.lattice, self.pos, labels=edge_labels)
+        plt.show()
+
+    def draw_matching_graph(self):
+        pos = nx.circular_layout(self.matching_graph)
+        nx.draw(self.matching_graph, pos, with_labels=True)
+        # edge_labels = nx.get_edge_attributes(self.matching_graph, 'weight')
+        # nx.draw_networkx_edge_labels(self.matching_graph, pos, labels=edge_labels)
+        plt.show()
 
     def calculate_syndrome(self):
         for node in self.lattice.nodes():
