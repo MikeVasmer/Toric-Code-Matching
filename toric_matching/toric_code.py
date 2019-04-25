@@ -18,7 +18,7 @@ class ToricCode(Code):
     def __init__(self, dim, l):
         Code.__init__(self, dim, l)
         self.lattice = nx.grid_graph(dim=([l] * dim), periodic=True)
-        nx.set_edge_attributes(self.lattice, 0, 'qubit_state', )
+        nx.set_edge_attributes(self.lattice, 0, 'qubit_state')
         # using convention -1 ^ (stabilizer_value)
         nx.set_node_attributes(self.lattice, 0, 'stabilizer_value')
         self.build_pos()
@@ -91,23 +91,44 @@ class ToricCode(Code):
                     self.lattice[correction_path[i]][correction_path[i + 1]]['qubit_state'] + 1) % 2
 
     def build_logicals(self):
+        # Generate logical X operators ([dim - 1] dimensional hyperplanes)
         self.logicals = []
-        seed = [1, ] + [0, ] * (self.dim - 1)
-        unique_perms = set(list(itertools.permutations(seed)))
-        while len(unique_perms) > 0:
-            perm = list(unique_perms.pop())
-            non_zero_index = 0
-            for i in range(len(perm)):
-                if perm[i] == 1:
-                    non_zero_index = i
+        varying_index_tuples = itertools.combinations(
+            range(self.dim), self.dim - 1)
+        l_range_list = [[i for i in range(self.l)]] * (self.dim - 1)
+        hyperplane_coordinates = list(itertools.product(*l_range_list))
+        for indices in varying_index_tuples:
             logical = []
-            for i in range(self.l):
-                next_perm = perm.copy()
-                next_perm[non_zero_index] = (
-                    next_perm[non_zero_index] + 1) % self.l
-                logical.append((tuple(perm), tuple(next_perm)))
-                perm = next_perm.copy()
+            fixed_index = 0
+            for i in range(self.dim):
+                if i not in indices:
+                    fixed_index = i
+                    break
+            for node in hyperplane_coordinates:
+                node = list(node)
+                node.insert(fixed_index, 0)
+                neighbour = node.copy()
+                neighbour[fixed_index] = 1
+                logical.append((tuple(node), tuple(neighbour)))
             self.logicals.append(logical)
+
+        # Below are logical Z ops... we need X!
+        # for i in range(dim):
+        # seed = [1, ] + [0, ] * (self.dim - 1)
+        # unique_perms = set(list(itertools.permutations(seed)))
+        # while len(unique_perms) > 0:
+        #     perm = list(unique_perms.pop())
+        #     non_zero_index = 0
+        #     for i in range(len(perm)):
+        #         if perm[i] == 1:
+        #             non_zero_index = i
+        #     logical = []
+        #     for i in range(self.l):
+        #         next_perm = perm.copy()
+        #         next_perm[non_zero_index] = (
+        #             next_perm[non_zero_index] + 1) % self.l
+        #         logical.append((tuple(perm), tuple(next_perm)))
+        #         perm = next_perm.copy()
 
     def check_correction(self):
         for logical in self.logicals:
