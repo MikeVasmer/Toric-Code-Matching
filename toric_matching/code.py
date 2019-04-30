@@ -27,9 +27,15 @@ class Code(ABC):
     def check_correction(self):
         pass
 
+    @abstractmethod
+    def clear_errors(self):
+        pass
+
     def one_run(self, p):
         self.generate_errors(p)
         self.calculate_syndrome()
         self.build_matching_graph()
         self.apply_correction()
-        return self.check_correction() 
+        result = self.check_correction() 
+        self.clear_errors()
+        return result

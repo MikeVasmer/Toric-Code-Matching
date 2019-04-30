@@ -113,3 +113,7 @@ jupyter-dev-notebooks/
 
 # nose test files
 .noseids
+
+# data files
+data/
+*.json

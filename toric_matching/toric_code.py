@@ -140,6 +140,9 @@ class ToricCode(Code):
                 return False
         return True
 
+    def clear_errors(self):
+        nx.set_edge_attributes(self.lattice, 0, 'qubit_state')
+
     def print_syndrome(self):
         # print('Stabilizer = Value')
         print('Unsatisfied stabilizers:')
